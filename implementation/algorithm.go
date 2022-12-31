@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"sort"
 
@@ -42,10 +41,35 @@ func (pizi *piziStar) process_state() int {
 				x.costToGoal = neighbor.h() + pizi.c(neighbor, x)
 			}
 		}
+
 	} else if k_old == x.h() {
-		fmt.Println("")
+		for _, y := range x.neighbors {
+			if (y.tag == "new") ||
+			 (y.next == x && y.costToGoal != x.costToGoal+pizi.c(x, y)) || 
+			 (y.next != x && y.costToGoal > x.costToGoal +pizi.c(x, y)) {
+				y.next = x
+				new_h := x.costToGoal + pizi.c(x, y)
+				pizi.Insert(y, new_h)
+			}
+		}
+
 	} else {
-		fmt.Println("")
+		for _, y := range x.neighbors {
+			if (y.tag == "new") || (y.next == x && y.costToGoal != x.costToGoal+pizi.c(x, y)) {
+				y.next = x
+				new_h := x.costToGoal + pizi.c(x, y)
+				pizi.Insert(y, new_h)
+
+			} else {
+				if y.next != x && (y.costToGoal > x.costToGoal+pizi.c(x, y)) {
+					pizi.Insert(x, x.costToGoal)
+				} else {
+					if y.next != x && (x.costToGoal > y.costToGoal+pizi.c(y, x)) && y.tag == "closed" && y.costToGoal > k_old {
+						pizi.Insert(y, y.costToGoal)
+					}
+				}
+			}
+		}
 	}
 
 	return pizi.get_kmin()
@@ -54,8 +78,10 @@ func (pizi *piziStar) process_state() int {
 // returns the state on the OPENLIST with minimum k(.) value
 // (NULL if the list is empty)
 func (pizi *piziStar) min_state() *piziNode {
-
-	return pizi.openList[0]
+	if len(pizi.openList) > 0 {
+		return pizi.openList[0]
+	}
+	return nil
 }
 
 // returns Kmin for the OPENLIST (-1 if the list is empty)
@@ -105,7 +131,7 @@ func (pizi *piziStar) Insert(node *piziNode, h_new int) {
 	pizi.openList = sortOpenlist(pizi.openList)
 }
 
-func sortOpenlist(list []*piziNode) []*piziNode{
+func sortOpenlist(list []*piziNode) []*piziNode {
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].key < list[j].key
 	})
