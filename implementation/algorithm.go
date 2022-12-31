@@ -1,28 +1,44 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"sort"
 
-	"github.com/pxsa/iGraph"
 	"golang.org/x/exp/slices"
 )
 
 type piziStar struct {
 	start    *piziNode
 	goal     *piziNode
-	land     *Land
 	openList []*piziNode
-	iGraph.Graph
 }
 
 func (pizi *piziStar) Start() {
 	// Initial
+	pizi.Insert(pizi.goal, 0)
 	processResult := 0
+
 	for processResult > -1 {
 		processResult = pizi.process_state()
 	}
-	// reconstruction()
+	path := pizi.reconstruction()
+	showPath(path)
+}
+
+func showPath(path []*piziNode) {
+	fmt.Println("")
+}
+
+func (pizi *piziStar) reconstruction() []*piziNode {
+	path := []*piziNode{}
+	tmp := pizi.start
+	for tmp != pizi.goal {
+		path = append(path, tmp)
+		tmp = tmp.next
+	}
+	path = append(path, pizi.goal)
+	return path
 }
 
 func (pizi *piziStar) process_state() int {
@@ -75,6 +91,14 @@ func (pizi *piziStar) process_state() int {
 	return pizi.get_kmin()
 }
 
+func (pizi *piziStar) modify_cost(x *piziNode, newCost int) int {
+	// c(x, y) = cval
+	if x.tag == "closed" {
+		pizi.Insert(x, newCost)
+	}
+	return pizi.get_kmin()
+}
+
 // returns the state on the OPENLIST with minimum k(.) value
 // (NULL if the list is empty)
 func (pizi *piziStar) min_state() *piziNode {
@@ -107,7 +131,7 @@ func (pizi *piziStar) c(a, b *piziNode) int {
 	// 		return edge.Weight
 	// 	}
 	// }
-	return -1
+	return 1
 }
 
 func (pizi *piziStar) Insert(node *piziNode, h_new int) {

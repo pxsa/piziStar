@@ -13,7 +13,7 @@ type Land struct {
 func (l *Land) init(rows, cols int) {
 	l.rows = rows
 	l.cols = cols
-	// شب که میشه به عشق تو غزل غزل صدا میشم ترانه خون قضه تمام عاشقا میشم
+	// (ابی)شب که میشه به عشق تو غزل غزل صدا میشم ترانه خون قصه تمام عاشقا میشم
 	l.nodes = make([][]*piziNode, rows)
 	for i := range l.nodes {
 		l.nodes[i] = make([]*piziNode, cols)
@@ -22,35 +22,53 @@ func (l *Land) init(rows, cols int) {
 			l.nodes[i][j] = initNode(i, j)
 		}
 	}
+
+	// this is not good (search for the bether solution)
+	for i := range l.nodes {
+		for j := range l.nodes[i] {
+			l.detectNeighbors(l.nodes[i][j])
+		}
+	}
 }
+
+func (l *Land) makeObstacle(node *piziNode ,status bool) {
+	node.isObstacle = status
+}
+
+// func (l *Land) makeObstacle(row, col int ,status bool) {
+// 	l.nodes[row][col].isObstacle = status
+// }
 
 func initNode(i, j int) *piziNode{
 	return &piziNode{
 		row: i,
 		col: j,
 		tag: "new",
+		isObstacle: false,
+		next: nil,
+		costToGoal: -1, // not sure about this.
 	}
 }
 
 func (l *Land) detectNeighbors(node *piziNode) {
 	neighbors := []*piziNode{}
 
-	// upper neighbor
+	// left neighbor
 	if node.row - 1 >= 0 {
 		neighbors = append(neighbors, l.nodes[node.row-1][node.col])
 	}
 	
-	// bottom neighbor
+	// right neighbor
 	if node.row + 1 < l.rows {
 		neighbors = append(neighbors, l.nodes[node.row+1][node.col])
 	}
 	
-	// left neighbor
+	// upper neighbor
 	if node.col - 1 >= 0 {
 		neighbors = append(neighbors, l.nodes[node.row][node.col-1])
 	}
 	
-	// right neighbor
+	// lower neighbor
 	if node.col + 1 < l.cols {
 		neighbors = append(neighbors, l.nodes[node.row][node.col+1])
 	}
