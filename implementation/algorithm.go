@@ -3,30 +3,18 @@ package main
 import (
 	"fmt"
 	"math"
+	"sort"
 
 	"github.com/pxsa/iGraph"
 	"golang.org/x/exp/slices"
 )
 
 type piziStar struct {
-	states   []*myNode
-	openList []*myNode
-	start    *myNode
-	goal     *myNode
+	start    *piziNode
+	goal     *piziNode
+	land     *Land
+	openList []*piziNode
 	iGraph.Graph
-}
-
-type myNode struct {
-	tag        string
-	neighbors  []*myNode
-	next       *myNode
-	costToGoal int
-	key int
-	iGraph.Node
-}
-
-func (node myNode) GetValue() int {
-	return 1
 }
 
 func (pizi *piziStar) Start() {
@@ -65,87 +53,62 @@ func (pizi *piziStar) process_state() int {
 
 // returns the state on the OPENLIST with minimum k(.) value
 // (NULL if the list is empty)
-func (pizi *piziStar) min_state() *myNode {
-	// for node := range pizi.openList {
-	// }
+func (pizi *piziStar) min_state() *piziNode {
+
 	return pizi.openList[0]
 }
 
 // returns Kmin for the OPENLIST (-1 if the list is empty)
 func (pizi *piziStar) get_kmin() int {
 
-	return pizi.min_state().k()
+	if len(pizi.openList) > 0 {
+		return pizi.openList[0].key
+	}
+	return -1
 }
 
-func (pizi *piziStar) delete(node *myNode) {
-	// METHOD 1
-	// var idx int
-	// for index, curNode := range pizi.openList {
-	// 	if curNode == node {
-	// 		idx = index
-	// 	} 
-	// }
+func (pizi *piziStar) delete(node *piziNode) {
 
-	// method 2
-	idx := slices.Index[*myNode](pizi.openList, node)
+	idx := slices.Index[*piziNode](pizi.openList, node)
 
 	pizi.openList[idx].tag = "closed"
 	pizi.openList = append(pizi.openList[:idx], pizi.openList[idx+1:]...)
 }
 
-func (node *myNode) h() int {
-	return node.costToGoal
-}
-
-func (node *myNode) b() *myNode {
-	return node.next
-}
-
-func (pizi *piziStar) c(a, b *myNode) int {
-	for _, edge := range pizi.Graph.Edges {
-		if edge.Origin == b && edge.Destination == a {
-			return edge.Weight
-		}
-	}
+func (pizi *piziStar) c(a, b *piziNode) int {
+	// for _, edge := range pizi.Graph.Edges {
+	// 	if edge.Origin == b && edge.Destination == a {
+	// 		return edge.Weight
+	// 	}
+	// }
 	return -1
 }
 
-func (node *myNode) k() int {
-	return 1
-}
-
-func (pizi *piziStar) Insert(node *myNode, h_new int) {
+func (pizi *piziStar) Insert(node *piziNode, h_new int) {
 	kx := -1
+	// insertedList.add(node)
 	if node.tag == "new" {
-		node.tag = "open"
 		kx = h_new
-		node.key = kx
+
 	} else if node.tag == "open" {
 		kx = int(math.Min(float64(node.key), float64(h_new)))
-	} else if node.tag == "closed" {
-		kx = int(math.Min(float64(node.h()), float64(h_new)))
-		node.key = kx
-		node.costToGoal = h_new
-		node.tag = "open"
-	}
 
-	node.costToGoal = h_new
-	if len(pizi.openList) > 0 {
-		checksum := 0
-		for i, curNode := range pizi.openList {
-			if node.key <= curNode.key {
-				// slices.Insert[*myNode](pizi.openList, i, node)
-				pizi.openList = append(pizi.openList[:i+1], pizi.openList[i:]...)
-				pizi.openList[i] = node
-				break
-			} else {
-				checksum++
-			}
-		}
-		if checksum == len(pizi.openList) {
-			pizi.openList = append(pizi.openList, node)
-		}
-	} else {
-			pizi.openList = append(pizi.openList, node)
+	} else if node.tag == "closed" {
+		kx = int(math.Min(float64(node.costToGoal), float64(h_new)))
+		//obstacle
 	}
+	node.tag = "open"
+	node.key = kx
+	node.costToGoal = h_new
+
+	pizi.openList = append(pizi.openList, node)
+	pizi.openList = sortOpenlist(pizi.openList)
+}
+
+func sortOpenlist(list []*piziNode) []*piziNode{
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].key < list[j].key
+	})
+
+	return list
 }
