@@ -2,7 +2,7 @@
 #define PIZISTAR_H
 
 #include "node.h"
-#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -12,21 +12,34 @@ public:
     PiziStar();
     ~PiziStar();
 
+    void start();
+    vector<Node*> reconstruction();
+    int process_state();
+    int modify_state();
+    Node* min_state();
+    int get_kmin();
+    void deleteNode(Node* node);
+    void insert(Node* node, int h_new);
+
     void clearList(list<Node*> list);
 
-private:
-    list<Node*> pathStorage;
-    list<Node*> openList;
-    list<Node*> insertedList;
-    //
-    list<Node*> openNodes;
-    list<Node*> closedNodes;
+    Node *getStart() const;
+    void setStart(Node *newStart);
 
-    list<Node*> nodes;
-    //
-    Node start;
-    Node goal;
-    int numberOfNode;
+    Node *getGoal() const;
+    void setGoal(Node *newGoal);
+
+    vector<Node *> getOpenList() const;
+    void setOpenList(const vector<Node *> &newOpenList);
+
+    vector<Node *> getPathStorage() const;
+    void setPathStorage(const vector<Node *> &newPathStorage);
+
+private:
+    vector<Node*> openList;
+    vector<Node*> pathStorage;
+    Node* start = nullptr;
+    Node* goal  = nullptr;
 };
 
 #endif // PIZISTAR_H
