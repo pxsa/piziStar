@@ -5,7 +5,7 @@ Land::Land(int rows, int cols)
     this->rows = rows;
     this->cols = cols;
 
-    nodes = vector<Node*>(rows);
+    nodes = vector<vector<Node*>>(rows);
     for (int i=0; i<rows; i++) {
         nodes[i] = vector<Node*>(cols);
         for (int j=0; j<cols; j++) {
@@ -26,7 +26,7 @@ void Land::configureObstacle(Node* node, bool status)
     node->setIsObstacle(status);
 }
 
-Node *Land::createNode(int i, j)
+Node *Land::createNode(int i, int j)
 {
     Node* node = new Node();
 
@@ -88,12 +88,12 @@ void Land::setCols(int newCols)
     cols = newCols;
 }
 
-vector<vector<_Tp1> > Land::getNodes() const
+vector<vector<Node *> > Land::getNodes() const
 {
     return nodes;
 }
 
-void Land::setNodes(const vector<vector<_Tp1> > &newNodes)
+void Land::setNodes(const vector<vector<Node *> > &newNodes)
 {
     nodes = newNodes;
 }

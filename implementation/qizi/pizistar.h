@@ -2,6 +2,7 @@
 #define PIZISTAR_H
 
 #include "node.h"
+#include "land.h"
 #include <vector>
 
 using namespace std;
@@ -9,10 +10,10 @@ using namespace std;
 class PiziStar
 {
 public:
-    PiziStar();
+    PiziStar(int row, int col);
     ~PiziStar();
 
-    void start();
+    void init();
     vector<Node*> reconstruction();
     int process_state();
     int modify_state();
@@ -21,7 +22,7 @@ public:
     void deleteNode(Node* node);
     void insert(Node* node, int h_new);
 
-    void clearList(list<Node*> list);
+    void clearList(vector<Node*> list);
 
     Node *getStart() const;
     void setStart(Node *newStart);
@@ -38,6 +39,7 @@ public:
 private:
     vector<Node*> openList;
     vector<Node*> pathStorage;
+    Land* land  = nullptr;
     Node* start = nullptr;
     Node* goal  = nullptr;
 };

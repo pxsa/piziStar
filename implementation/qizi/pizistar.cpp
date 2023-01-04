@@ -1,54 +1,23 @@
 #include "pizistar.h"
 
-PiziStar::PiziStar()
+PiziStar::PiziStar(int row, int col)
 {
-    for (int i=0; i<numberOfNode; i++) {
-        Node* node = new Node();
-        node->setCostToGoal(0);
-        node->setTag("new");
-        node->setNext(nullptr);
-
-        nodes.push_front(node);
-    }
+    land = new Land(row, col);
 }
 
 PiziStar::~PiziStar()
 {
-    clearList(this->insertedList);
     clearList(this->pathStorage);
-    clearList(this->closedNodes);
-    clearList(this->openNodes);
     clearList(this->openList);
-    clearList(this->nodes);
 }
 
-void PiziStar::clearList(list<Node *> list)
+void PiziStar::clearList(vector<Node *> list)
 {
     while (!list.empty()) {
         delete list.front();
-        list.pop_front();
+        list.pop_back();
     }
     list.clear();
-}
-
-list<Node *> PiziStar::getOpenList() const
-{
-    return openList;
-}
-
-void PiziStar::setOpenList(const list<Node *> &newOpenList)
-{
-    openList = newOpenList;
-}
-
-list<Node *> PiziStar::getPathStorage() const
-{
-    return pathStorage;
-}
-
-void PiziStar::setPathStorage(const list<Node *> &newPathStorage)
-{
-    pathStorage = newPathStorage;
 }
 
 Node *PiziStar::getStart() const

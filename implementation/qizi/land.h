@@ -12,7 +12,7 @@ public:
     Land(int rows, int cols);
 
     void configureObstacle(Node *node, bool status);
-    Node* createNode(int i,j);
+    Node* createNode(int i, int j);
     void detectNeighbors(Node* node);
 
     int getRows() const;
@@ -21,13 +21,13 @@ public:
     int getCols() const;
     void setCols(int newCols);
 
-    vector<vector<_Tp1> > getNodes() const;
-    void setNodes(const vector<vector<_Tp1> > &newNodes);
+    vector<vector<Node*> > getNodes() const;
+    void setNodes(const vector<vector<Node*> > &newNodes);
 
 private:
     int rows;
     int cols;
-    vector<vector<*Node>> nodes;
+    vector<vector<Node*>> nodes;
 };
 
 #endif // LAND_H
